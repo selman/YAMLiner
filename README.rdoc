@@ -1,9 +1,42 @@
 = YAMLiner
 
-Description goes here.
+Simple gem that supplies inline YAML CRUD operations that usable by all kind of text files.
+
+sample file 'test.rb':
+
+  #!/usr/bin/env ruby
+
+  puts 'test'
+
+irb session:
+
+  >> require 'YAMLiner'
+  => true
+  >> y = YAMLiner.new('test.rb', :line => 2, :object => {:name => 'selman', :surname => 'ulug'})
+  => #<YAMLiner:0x0000000221e668 @options={:name=>"YAMLiner", :line=>2, :object=>{:name=>"selman", :surname=>"ulug"}, :beginner=>"#", :ender=>"", :backup=>true}, file"test.rb"
+  >> y.write!
+  => nil
+  >> y.read
+  => {:name=>"selman", :surname=>"ulug"}
+
+new 'test.rb':
+
+  #!/usr/bin/env ruby
+  #YAMLiner--- {:name: selman, :surname: ulug}
+
+  puts 'test'
+
+== Options
+
+:name => 'YAMLiner'  ::  names the config line using this you can add lots of lines
+:line => 1           ::  it is important for first write after than reads & writes first matched line
+:object => nil       ::  ruby object that will be converted to YAML
+:beginner => '#'     ::  comment line beginner example '/*' for C files
+:ender => ''         ::  comment line ender example '*/' for C files
+:backup => true      ::  saves .bak file after modifications
 
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a

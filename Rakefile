@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "YAMLiner"
-    gem.summary = "inline YAML config lines for any text file"
-    gem.description = "CRUD operations for inline YAML config lines for any text file"
+    gem.summary = "inline YAML CRUD operations"
+    gem.description = "Simple gem that supplies inline YAML CRUD operations that usable by all kind of text files."
     gem.email = "selman.ulug@gmail.com"
     gem.homepage = "http://github.com/selman/YAMLiner"
     gem.authors = ["Selman ULUG"]
