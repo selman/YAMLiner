@@ -2,12 +2,16 @@ require 'yaml'
 require 'tempfile'
 require 'fileutils'
 
+#You can get inline YAML only redefining "to_yaml_style"
 class Object
   def to_yaml_style
     :inline
   end
 end
 
+=begin
+  y = YAMLiner.new("test.rb", :line => 2, :object => {:name => "selman"})
+=end
 class YAMLiner
   attr_accessor :file, :options
 
@@ -36,20 +40,21 @@ class YAMLiner
   end
 
   def write!
-    with_temp do |t|
+    generated = generate_line
+    with_temp do |temp|
       File.foreach(@file) do |line|
         if @options[:line] == $.
-          line =~ match_line_format ? line = generate_line : t << generate_line
+          line =~ match_line_format ? line = generated : temp << generated
         end
-        t << line
+        temp << line
       end
     end
   end
 
   def delete!
-    with_temp do |t|
+    with_temp do |temp|
       File.foreach(@file) do |line|
-        t << line unless line =~ match_line_format
+        temp << line unless line =~ match_line_format
       end
     end
   end
