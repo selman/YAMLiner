@@ -26,7 +26,7 @@ class YAMLiner
       :backup => true
     }
     @options.merge!(options) unless options.empty?
-    check_options
+    check_options []
     @match_line = %r/(^#{Regexp.escape(@options[:prefix] + @options[:name])})(.*?)(#{Regexp.escape(@options[:postfix])}$)/
   end
 
@@ -43,7 +43,7 @@ class YAMLiner
   end
 
   def write!
-    check_options [:file, :line, :input]
+    check_options [:file, :input]
     yamline = @options[:prefix] + @options[:name] + @options[:input].to_yaml.chop + @options[:postfix] + "\n"
 
     with_temp do |temp|
