@@ -2,38 +2,37 @@
 
 Simple gem that supplies inline YAML CRUD operations that usable by all kind of text files.
 
-sample file 'test.rb':
+sample file 'test.txt':
+
+  foo
+
+  bar
+
+sample:
 
   #!/usr/bin/env ruby
+  require 'YAMLiner'
 
-  puts 'test'
+  y = YAMLiner.new(:file => 'test.txt', :line => 2, :input => {:name => 'selman', :surname => 'ulug'})
+  y.write!
 
-irb session:
+new 'test.txt':
 
-  >> require 'YAMLiner'
-  => true
-  >> y = YAMLiner.new('test.rb', :line => 2, :object => {:name => 'selman', :surname => 'ulug'})
-  => #<YAMLiner:0x0000000221e668 @options={:name=>"YAMLiner", :line=>2, :object=>{:name=>"selman", :surname=>"ulug"}, :beginner=>"#", :ender=>"", :backup=>true}, file"test.rb"
-  >> y.write!
-  => nil
-  >> y.read
-  => {:name=>"selman", :surname=>"ulug"}
-
-new 'test.rb':
-
-  #!/usr/bin/env ruby
+  foo
   #YAMLiner--- {:name: selman, :surname: ulug}
 
-  puts 'test'
+  bar
 
 == Options
 
-:name => 'YAMLiner'  ::  names the config line using this you can add lots of lines
-:line => 1           ::  it is important for first write after than reads & writes first matched line
-:object => nil       ::  ruby object that will be converted to YAML
-:beginner => '#'     ::  comment line beginner example '/*' for C files
-:ender => ''         ::  comment line ender example '*/' for C files
-:backup => true      ::  saves .bak file after modifications
+:name => 'YAMLiner':names the config line using this you can add lots of lines
+:file => ''        :file that we will modify or read
+:line => 1         :it is important for first write after than reads & writes first matched line
+:input => nil      :ruby object that will be converted to YAMLiner
+:output => nil     :ruby object that will be read from text file
+:prefix => '#'     :comment line beginner example '/*' for C files
+:postfix => ''     :comment line ender example '*/' for C files
+:backup => true    :saves .bak file after modifications
 
 == Note on Patches/Pull Requests
 

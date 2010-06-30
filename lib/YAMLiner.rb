@@ -10,51 +10,57 @@ class Object
 end
 
 =begin
-  y = YAMLiner.new("test.rb", :line => 2, :object => {:name => "selman"})
+  y = YAMLiner.new(:file => "test.rb", :line => 2, :input => {:name => "selman"})
 =end
 class YAMLiner
-  attr_accessor :file, :options
 
-  def initialize(file, options = {})
+  def initialize(options = {})
     @options = {
       :name => 'YAMLiner',
+      :file => '',
       :line => 1,
-      :object => nil,
-      :beginner => '#',
-      :ender => '',
+      :input => nil,
+      :output => nil,
+      :prefix => '#',
+      :postfix => '',
       :backup => true
     }
     @options.merge!(options) unless options.empty?
-    @file = file
+    check_options
+    @match_line = %r/(^#{Regexp.escape(@options[:prefix] + @options[:name])})(.*?)(#{Regexp.escape(@options[:postfix])}$)/
   end
 
   def read
-    File.foreach(@file) do |line|
-      if line =~ match_line_format
-        @options[:object] = object_from(line)
+    check_options [:file]
+    File.foreach(@options[:file]) do |rline|
+      if rline =~ @match_line
+        @options[:output] = YAML::load($2)
         @options[:line] = $.
         break
       end
     end
-    @options[:object]
+    @options[:output]
   end
 
   def write!
-    generated = generate_line
+    check_options [:file, :line, :input]
+    yamline = @options[:prefix] + @options[:name] + @options[:input].to_yaml.chop + @options[:postfix] + "\n"
+
     with_temp do |temp|
-      File.foreach(@file) do |line|
+      File.foreach(@options[:file]) do |wline|
         if @options[:line] == $.
-          line =~ match_line_format ? line = generated : temp << generated
+          wline =~ @match_line ? wline = yamline : temp << yamline
         end
-        temp << line
+        temp << wline
       end
     end
   end
 
   def delete!
+    check_options [:file]
     with_temp do |temp|
-      File.foreach(@file) do |line|
-        temp << line unless line =~ match_line_format
+      File.foreach(@options[:file]) do |dline|
+        temp << dline unless dline =~ @match_line
       end
     end
   end
@@ -66,22 +72,16 @@ class YAMLiner
     yield(temp)
   ensure
     temp.close
-    FileUtils.mv(@file, "#{@file}.bak") if @options[:backup]
-    FileUtils.mv(temp.path, @file)
+    file = @options[:file]
+    FileUtils.mv(file, "#{file}.bak") if @options[:backup]
+    FileUtils.mv(temp.path, file)
   end
 
-  def generate_line
-    @options[:beginner] + @options[:name] + @options[:object].to_yaml.chop + @options[:ender] + "\n"
-  end
-
-  def match_line_format
-    %r(^#{Regexp.escape(@options[:beginner] + @options[:name])}.*#{Regexp.escape(@options[:ender])}$)
-  end
-
-  def object_from(line)
-    line.gsub!(%r(^#{Regexp.escape(@options[:beginner] + @options[:name])}), '')
-    line.gsub!(%r(#{Regexp.escape(@options[:ender])}$), '') unless @options[:ender].empty?
-    YAML::load(line)
+  def check_options(options)
+    options += [:name, :prefix]
+    options.each do |opt|
+      raise ArgumentError.new("\":#{opt}\" option must be set") if @options[opt].nil? or @options[opt].empty?
+    end
   end
 
 end
