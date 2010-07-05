@@ -3,10 +3,13 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe "Yamliner" do
 
   before(:all) do
-    @test_file = Tempfile.new('testing')
-    @test_file.puts "Test File"
+    @test_file = File.join(Dir.pwd, 'spec/test.txt')
+    @test_file_bak = File.join(Dir.pwd, 'spec/test.txt.bak')
+    File.open(@test_file, 'w+') do |f|
+      f.puts "Test File"
+    end
     @input = {:name => 'selman', :surname => 'ulug'}
-    @yamliner = YAMLiner.new(:file => @test_file.path, :input => @input)
+    @y = YAMLiner.new(:file => @test_file, :object => @input)
   end
 
   it "should raise ArgumentError without :name or :prefix parameters" do
@@ -15,7 +18,22 @@ describe "Yamliner" do
     lambda { YAMLiner.new }.should_not raise_exception(ArgumentError)
   end
 
+  it 'should write to file and read from file' do
+    @y.write!
+    @y[:file] = @test_file_bak
+    should be_true(@y[:object] == @input)
+    @y[:file] = @test_file
+  end
+
+  it 'should delete from file' do
+    @y.delete!
+    @y[:file] = @test_file_bak
+    should be_true(@y.read == @input)
+    @y[:file] = @test_file
+  end
+
   after(:all) do
-    @test_file.close
+    FileUtils.rm(@test_file)
+    FileUtils.rm(@test_file_bak)
   end
 end

@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{YAMLiner}
-  s.version = "0.1.0"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Selman ULUG"]
-  s.date = %q{2010-06-30}
+  s.date = %q{2010-07-05}
   s.description = %q{Simple gem that supplies inline YAML CRUD operations that usable by all kind of text files.}
   s.email = %q{selman.ulug@gmail.com}
   s.extra_rdoc_files = [
@@ -23,10 +23,12 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
-     "lib/YAMLiner.rb",
-     "spec/YAMLiner_spec.rb",
+     "YAMLiner.gemspec",
+     "lib/yamliner.rb",
+     "lib/yamliner_task.rb",
      "spec/spec.opts",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "spec/yamliner_spec.rb"
   ]
   s.homepage = %q{http://github.com/selman/YAMLiner}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -35,7 +37,7 @@ Gem::Specification.new do |s|
   s.summary = %q{inline YAML CRUD operations}
   s.test_files = [
     "spec/spec_helper.rb",
-     "spec/YAMLiner_spec.rb"
+     "spec/yamliner_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
