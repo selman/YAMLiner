@@ -19,17 +19,22 @@ describe "Yamliner" do
   end
 
   it 'should write to file and read from file' do
+    @y[:file] = @test_file
     @y.write!
     @y[:file] = @test_file_bak
-    should be_true(@y[:object] == @input)
-    @y[:file] = @test_file
+    @y.read
+    @y[:object].should eql(@input)
   end
 
-  it 'should delete from file' do
-    @y.delete!
-    @y[:file] = @test_file_bak
-    should be_true(@y.read == @input)
+  it 'should delete from file and can not read again' do
     @y[:file] = @test_file
+    @y.delete!
+    # @y.read
+    # @y[:object].should_not eql(@input)
+    # @y[:object].should eql(nil)
+    @y[:file] = @test_file_bak
+    @y.read
+    @y[:object].should eql(@input)
   end
 
   after(:all) do

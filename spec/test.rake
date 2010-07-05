@@ -1,8 +1,8 @@
 begin
-  require File.join(File.dirname(__FILE__), '../lib/yamliner_task')
-  YAMLiner::Tasks.new do |c|
-    c.params[:name] = "selman"
-  end
-rescue LoadError
+  require File.join(Dir.pwd, 'lib/yamliner')
+  require File.join(Dir.pwd, 'lib/yamliner_task')
+  YAMLiner::Tasks.new
+rescue LoadError => e
+  puts e.message
   puts "YAMLiner not available. Install it with: gem install YAMLiner"
 end

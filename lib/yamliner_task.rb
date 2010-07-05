@@ -1,5 +1,3 @@
-require 'yamliner'
-
 class YAMLiner
   require 'rake/tasklib'
 
@@ -9,12 +7,20 @@ class YAMLiner
   class Tasks < ::Rake::TaskLib
     attr_accessor :params
 
-    def initialize
-      @params = {:test => 'deneme'}
+    def initialize(params = {})
       @params.merge!(params) unless params.empty?
-      @yamliner = YAMLiner.new(@params)
+      @yamliner = YAMLiner.new
+
       yield self if block_given?
       define
+    end
+
+    def [](key)
+      @params[key]
+    end
+
+    def []=(key, value)
+      @params[key] = value
     end
 
     private
@@ -43,12 +49,15 @@ class YAMLiner
   end #Config
 
   def ylt_move
+    "move"
   end
 
   def ylt_copy
+    "copy"
   end
 
   def ylt_inserfile
+    "insertfile"
   end
 
 end # YAMLiner

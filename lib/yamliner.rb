@@ -22,11 +22,11 @@ class YAMLiner
     @params.merge!(params) unless params.empty?
     check_params
     @match_line = %r/(^#{Regexp.escape(@params[:prefix] + @params[:name])})(.*?)(#{Regexp.escape(@params[:postfix])}$)/
-    @file = nil || File.readlines(params[:file])
+    @file = [] || File.readlines(params[:file])
   end
 
   def read
-    return false if @file.nil?
+    return false if @file.empty?
     check_params [:file]
     @file.each do |rline|
       if rline =~ @match_line
@@ -53,12 +53,13 @@ class YAMLiner
   end
 
   def delete!
-    return false if @file.nil?
+    return false if @file.empty?
     check_params [:file]
     temp = []
     @file.each do |dline|
       temp << dline unless dline =~ @match_line
     end
+    @params[:object] = nil
     save_file(temp)
   end
 

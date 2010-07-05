@@ -5,7 +5,7 @@ describe "YamlinerTask" do
   before(:each) do
     @rake = Rake::Application.new
     Rake.application = @rake
-    load File.expand_path(File.dirname(__FILE__) + '/test.rake')
+    load File.join(Dir.pwd, 'spec/test.rake')
 #    Rake::Task.define_task(:config)
   end
 
