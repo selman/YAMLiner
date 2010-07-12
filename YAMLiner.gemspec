@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Selman ULUG"]
-  s.date = %q{2010-07-05}
+  s.date = %q{2010-07-13}
   s.description = %q{Simple gem that supplies inline YAML CRUD operations that usable by all kind of text files.}
   s.email = %q{selman.ulug@gmail.com}
   s.extra_rdoc_files = [
@@ -25,7 +25,6 @@ Gem::Specification.new do |s|
      "VERSION",
      "YAMLiner.gemspec",
      "lib/yamliner.rb",
-     "lib/yamliner_task.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
      "spec/yamliner_spec.rb"
