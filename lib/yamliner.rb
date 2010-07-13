@@ -1,35 +1,12 @@
-#= What is this?
-#With this library you gives a ruby object and it returns this to
-#<b>inline YAML</b> line with your specified options.
-#== Installation
-#  (sudo) gem install YAMLiner
-#then in your source code;
-#  require 'yamliner'
+#Defines YAMLiner class
 require 'yaml'
 require 'fileutils'
 
-#= Usage Samples
-#  >> my_hash = {:name => 'selman', :surname => 'ulug'}
-#  => {:name=>"selman", :surname=>"ulug"}
-#  >> y = YAMLiner.new(:object => my_hash)
-#  => #<YAMLiner:0x9a19d00 @params={:name=>"YAMLiner", :file=>"", :line=>0, :object=>{:name=>"selman", :surname=>"ulug"}, :prefix=>"#", :postfix=>"", :backup=>true}, file[], match_line>                                          
-#  >> y.yamline 
-#  => "#YAMLiner--- {:name: selman, :surname: ulug}\n"
-#It supplies
-#CRUD[http://en.wikipedia.org/wiki/Create,_read,_update_and_delete]
-#operation functions #read, #delete!, #write! (creates and updates)
-#you can change :name, :prefix, :postfix for every type of text file
-#comment styles like this:
-#  >> y[:prefix] = '/*'
-#  => "/*"
-#  >> y[:postfix] = '*/'
-#  => "*/"
-#  >> y[:name] = 'my_c_comment'
-#  => "my_c_comment"
-#  >> y.yamline 
-#  => "/*my_c_comment--- {:name: selman, :surname: ulug}*/\n"
+
+#YAMLiner class definition
 class YAMLiner
-  #Redifined [] and []= you can access all parameters like:
+  #Our accessor to carry values between function [] and []= redifined
+  #you can access all params like this:
   #  y = YAMLiner.new()
   #  y[:name] = "my_comment"
   attr_accessor :params
@@ -43,7 +20,7 @@ class YAMLiner
       :object => nil,
       :prefix => '#',
       :postfix => '',
-      :backup => true
+      :backup => false
     }
     @params.merge!(params) unless params.empty?
     @file = []
@@ -92,6 +69,8 @@ class YAMLiner
 
   #Returns generated YAMLiner line
   def yamline
+    #You can get inline YAML only redefining *to_yaml_style* method
+    @params[:object].instance_eval { def to_yaml_style; :inline; end }
     @params[:prefix] + @params[:name] + @params[:object].to_yaml.chop + @params[:postfix] + "\n"
   end
 
@@ -107,20 +86,16 @@ class YAMLiner
 
   private
 
-  def read_file
-    unless @params[:file].empty?
-      begin
-        @file = File.readlines(@params[:file])
-      rescue Errno::ENOENT
-        #file not found it's ok for writing
-      end
-    end
+  def read_file?
+    return false if @params[:file].empty?
+    return false unless File.exists?(@params[:file])
+    @file = File.readlines(@params[:file])
   end
 
   def save_file(temp)
     @params[:backup] ? file = "#{@params[:file]}.bak" : file = @params[:file]
     File.open(file, 'w+') { |f| f.puts temp }
-    read_file
+    read_file?
   end
 
   def check_params(params = [])
@@ -128,14 +103,8 @@ class YAMLiner
     params.each do |opt|
       raise ArgumentError.new("\":#{opt}\" option must be set") if @params[opt].nil? or @params[opt].empty?
     end
-    read_file
+    read_file? if params.include?(:file)
   end
 
 end # YAMLiner
 
-class Object
-  #You can get inline YAML only redefining this method
-  def to_yaml_style
-    :inline
-  end
-end # Object

@@ -8,7 +8,7 @@ describe "Yamliner" do
       f.puts "Test File"
     end
     @input = {:name => 'selman', :surname => 'ulug'}
-    @y = YAMLiner.new(:file => @test_file, :object => @input, :backup => false)
+    @y = YAMLiner.new(:object => @input)
   end
 
   it "should raise ArgumentError without :name or :prefix parameters" do
@@ -17,7 +17,17 @@ describe "Yamliner" do
     lambda { YAMLiner.new }.should_not raise_exception(ArgumentError)
   end
 
-  it "should reading attempt return false no YAMLiner" do
+  it "should raise Argument error when no file specified to read" do
+    lambda { @y.read }.should raise_exception(ArgumentError)
+  end
+
+  it "should return false when specified file is not available to read" do
+    @y[:file] = 'not_available.txt'
+    @y.read.should be_false
+  end
+
+  it "should read specified file and return false when no YAMLiner" do
+    @y[:file] = @test_file
     @y.read.should be_false
   end
 
@@ -25,10 +35,10 @@ describe "Yamliner" do
     @y.write!.should be_true
   end
 
-  it "should read and two objects must be equal" do
+  it "should read file and two objects must be equal" do
     @y.read.should_not be_false
     @y[:object].size.should eql(@input.size)
-    @input.each do |k,v|
+    @input.each do |k, v|
       @y[:object].has_key?(k).should be_true
       @y[:object].has_value?(v).should be_true
     end
