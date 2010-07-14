@@ -17,9 +17,9 @@ describe "Yamliner" do
   #   lambda { YAMLiner.new }.should_not raise_exception(ArgumentError)
   # end
 
-#  it "should raise Argument error when no file specified to read" do
-#    @input.yamline_read.should raise_exception
-#  end
+  it "should return nil when no file specified to read" do
+    @input.yamline_read.should be_false
+  end
 
   it "should return false when specified file is not available to read" do
     @input.params[:file] = 'not_available.txt'
