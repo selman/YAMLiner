@@ -15,12 +15,11 @@ module YAMLiner
       :writeto => '' }
 
     objects.each do |object|
-      if object.respond_to?(:to_yaml)
+      if object.kind_of?(Array) or object.kind_of?(Hash)
         object.extend(YAMLinerActions)
-        object.instance_variable_set(:@lines, [])
         object.instance_variable_set(:@params, params)
       else
-        raise "#{object.class} not responds \"to_yaml\" method"
+        raise "#{object.class} not suitable for data containing use Hash or Array"
       end
     end
   end
@@ -34,45 +33,34 @@ module YAMLiner
       :inline
     end
 
-    def match_line
-      %r/(^#{Regexp.escape(@params[:prefix] + @params[:name])})(.*?)(#{Regexp.escape(@params[:postfix])}$)/
-    end
-
     #Reads your supplied file/files if successfull returns readed object 
     #  Dir['**/*.txt].each {|f| y.read }
-    def yamline_read
-      return unless read_file?
-      @lines.each do |rline|
-        if rline =~ match_line
-          return YAML::load($2)
-        end
-      end
-      nil
+    def yamline_read(loaded = true)
+      return unless lines = read_file?
+      match_line = %r/(^#{Regexp.escape(@params[:prefix] + @params[:name])})(.*?)(#{Regexp.escape(@params[:postfix])}$)/
+      line_l = []
+      line_s = lines.select {|s| s =~ match_line; line_l << YAML::load($2) if $2 }
+      return if line_s.empty?
+      loaded ? line_l : line_s
     end
 
     #Writes the generated YAMLiner line to supplied file/files if there
     #is a same formated line it writes over it
     def yamline_write!
-      read_file?
-      #          return if @lines.size < params[:line]
-      temp = []
-      @lines.each do |wline|
-        if @params[:line] == @lines.index(wline)
-          wline =~ match_line ? wline = yamline : temp << yamline
-        end
-        temp << wline
+      unless lines = read_file?
+        lines += yamline
+      else
+        lines.insert(params[:line], yamline)
       end
-      save_file(temp)
+      save_file(lines)
     end
 
-    #Finds and deletes formatted line from supplied file/files
+    #Finds and deletes formatted line/lines from supplied file/files
     def yamline_delete!
-      return unless read_file?
-      temp = []
-      @lines.each do |dline|
-        temp << dline unless dline =~ match_line
-      end
-      save_file(temp)
+      return unless lines = read_file?
+      lines_readed = self.yamline_read(false)
+      lines_readed.each {|lr| lines.delete(lr) } if lines_readed
+      save_file(lines)
     end
 
     #Returns generated YAMLiner line
@@ -85,7 +73,7 @@ module YAMLiner
     def read_file?
       return if @params[:file].empty?
       return unless File.exists?(@params[:file])
-      @lines = File.readlines(@params[:file])
+      File.readlines(@params[:file])
     end
 
     def save_file(temp)

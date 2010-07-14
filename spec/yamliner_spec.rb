@@ -11,43 +11,39 @@ describe "Yamliner" do
     YAMLiner::line @input
   end
 
-  # it "should raise ArgumentError without :name or :prefix parameters" do
-  #   lambda { YAMLiner.new :name => '' }.should raise_exception(ArgumentError)
-  #   lambda { YAMLiner.new :prefix => nil }.should raise_exception(ArgumentError)
-  #   lambda { YAMLiner.new }.should_not raise_exception(ArgumentError)
-  # end
-
   it "should return nil when no file specified to read" do
-    @input.yamline_read.should be_false
+    @input.yamline_read.should be_nil
   end
 
-  it "should return false when specified file is not available to read" do
+  it "should return nil when specified file is not available to read" do
     @input.params[:file] = 'not_available.txt'
-    @input.yamline_read.should be_false
+    @input.yamline_read.should be_nil
   end
 
-  it "should read specified file and return false when no YAMLiner" do
+  it "should read specified file and return nil when no YAMLiner" do
     @input.params[:file] = @test_file
-    @input.yamline_read.should be_false
+    @input.yamline_read.should be_nil
   end
 
   it 'should write to file' do
-    @input.yamline_write!.should be_true
+    @input.yamline_write!.should_not be_nil
   end
 
   it "should read file and two objects must be equal" do
-    @input.yamline_read.should_not be_false
-    o = @input.yamline_read
-    o.size.should eql(@input.size)
-    @input.each do |k, v|
-      o.has_key?(k).should be_true
-      o.has_value?(v).should be_true
+    @input.yamline_read.should_not be_nil
+    read_lines = @input.yamline_read
+    read_lines.each do |rl|
+      rl.size.should eql(@input.size)
+      @input.each do |k, v|
+        rl.has_key?(k).should be_true
+        rl.has_value?(v).should be_true
+      end
     end
   end
 
   it 'should delete from file' do
-    @input.yamline_delete!.should be_true
-    @input.yamline_read.should be_false
+    @input.yamline_delete!.should_not be_nil
+    @input.yamline_read.should be_nil
   end
 
   after(:all) do
