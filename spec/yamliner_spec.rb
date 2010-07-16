@@ -11,17 +11,21 @@ describe "Yamliner" do
     YAMLiner::line @input
   end
 
+  it "should raise exception other than Array or Hash" do
+    lambda { s=''; YAMLiner::line s}.should raise_exception
+  end
+
   it "should return nil when no file specified to read" do
     @input.yamline_read.should be_nil
   end
 
   it "should return nil when specified file is not available to read" do
-    @input.params[:file] = 'not_available.txt'
+    @input.yamline_settings(:file => 'not_available.txt')
     @input.yamline_read.should be_nil
   end
 
   it "should read specified file and return nil when no YAMLiner" do
-    @input.params[:file] = @test_file
+    @input.yamline_settings(:file => @test_file)
     @input.yamline_read.should be_nil
   end
 
