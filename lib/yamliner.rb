@@ -11,7 +11,7 @@ require 'fileutils'
 module YAMLiner
   extend self
 
-  #extends given Array or Hash instance with YAMLinerActions
+  #extends given Object instance with YAMLinerActions
   #  a = {:name => 'selman', :surname => 'ulug'}
   #  YAMLiner::line a
   def line(*objects)
@@ -47,7 +47,7 @@ module YAMLiner
 
     #removing our yamline_settings instance variable
     def to_yaml_properties
-      to_yaml_properties_orginal - [:@yamline_settings]
+      to_yaml_properties_orginal - [:@yamline_settings, '@yamline_settings']
     end
 
     #Returns generated YAMLiner line
@@ -59,7 +59,7 @@ module YAMLiner
 
     #YAMLiner settings default values
     #  :name => 'YAMLiner'
-    #  :files => []
+    #  :file => ''
     #  :line => 0
     #  :prefix => '#'
     #  :postfix => ''
@@ -73,9 +73,9 @@ module YAMLiner
     def yamline_read(lines = nil, loaded = true)
       lines = file_lines unless lines
       return unless lines
-      matcher = %r{(^#{Regexp.escape(@yamline_settings[:prefix] + @yamline_settings[:name])})(.*?)(#{Regexp.escape(@yamline_settings[:postfix])}$)}
+      matcher = %r{^#{Regexp.escape(@yamline_settings[:prefix] + @yamline_settings[:name])}(.*?)#{Regexp.escape(@yamline_settings[:postfix])}$}
       line_l = []
-      line_s = lines.select {|line| line =~ matcher; line_l << YAML::load($2) if $2 }
+      line_s = lines.select {|line| line_l << YAML::load($1) if line =~ matcher }
       return if line_s.empty?
       loaded ? line_l : line_s
     end
@@ -106,10 +106,11 @@ module YAMLiner
     private
 
     def file_lines
-      file = @yamline_settings[:file]
-      return if file.empty?
-      return unless File.exists?(file)
-      File.readlines(file)
+      begin
+        File.readlines(@yamline_settings[:file])
+      rescue Exception
+        return
+      end
     end
 
     def save_file(temp)
