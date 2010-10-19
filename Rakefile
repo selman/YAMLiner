@@ -1,36 +1,35 @@
-require 'rubygems'
-require 'rake'
+$:.push File.expand_path("../lib", __FILE__)
+require "YAMLiner/version"
+
+require 'bundler'
+Bundler::GemHelper.install_tasks
+
+task :default => :spec
+
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new do |t|
+  t.pattern = 'spec/**/*_spec.rb'
+end
 
 begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "YAMLiner"
-    gem.summary = "inline YAML CRUD operations"
-    gem.description = "Simple gem that supplies inline YAML CRUD operations that usable by all kind of text files."
-    gem.email = "selman.ulug@gmail.com"
-    gem.homepage = "http://github.com/selman/YAMLiner"
-    gem.authors = ["Selman ULUG"]
-    gem.add_development_dependency "rspec", ">= 1.2.9"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
-  end
-  Jeweler::GemcutterTasks.new
+  require 'flay'
+  require 'flay_task'
+  FlayTask.new
 rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
+  task :flay do
+    abort "Flay is not available. In order to run flay, you must: sudo gem install flay"
+  end
 end
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
+begin
+  require 'flog'
+  require 'flog_task'
+  FlogTask.new
+rescue LoadError
+  task :flog do
+    abort "Flog is not available. In order to run flog, you must: sudo gem install flog"
+  end
 end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-end
-
-task :spec => :check_dependencies
 
 begin
   require 'reek/rake/task'
@@ -57,14 +56,13 @@ rescue LoadError
   end
 end
 
-task :default => :spec
-
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+  version = YAMLiner::VERSION
 
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "YAMLiner #{version}"
-  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('README.rdoc')
+  rdoc.main = 'README.rdoc'
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
